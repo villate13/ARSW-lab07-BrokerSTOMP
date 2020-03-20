@@ -8,6 +8,10 @@ var app = (function () {
     }
     
     var stompClient = null;
+    
+    // >> PART III << 
+    var connected = null;
+    var channel;
 
     var addPointToCanvas = function (point) {        
         var canvas = document.getElementById("canvas");
@@ -35,11 +39,16 @@ var app = (function () {
         
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
-            // >> PART II << console.log('Connected: ' + frame);
+            // >> PART III << 
+            console.log('Connected: ' + frame);
+            
             // >> PART I <<
             // >> PART I << removemos este pedazo de codigo para publicar en el topico
             // >> PART I << stompClient.subscribe('/topic/TOPICXX', function (eventbody) {
-            stompClient.subscribe('/topic/newpoint', function (eventbody) {
+            
+            // >> PART III << agregamos el canal 
+            stompClient.subscribe('/topic/newpoint' + channel, function (eventbody) {
+                console.log("Connection: " + channel);
                 // >> PART II << alert("Punto x: " + JSON.parse(eventbody.body).x + " Punto y: " + JSON.parse(eventbody.body).y);
                 // >> PART II <<
                 var pointX = JSON.parse(eventbody.body).x;
@@ -60,10 +69,13 @@ var app = (function () {
         init: function () {
             var can = document.getElementById("canvas");
             
+            // >> PART III << se inicializa sin canal, es decir desconectado
+            connected = false;
             //websocket connection
             
             // >> PART II <<
-            can.addEventListener("click", canvasClick = function canvasClick(evt) {
+            /* >> PART III << comentamos
+             * can.addEventListener("click", canvasClick = function canvasClick(evt) {
                 var pointX = getMousePosition(evt).x;
                 var pointY = getMousePosition(evt).y;
                 //alert("Punto x: " + pointX + " Punto y: " + pointY);
@@ -74,6 +86,41 @@ var app = (function () {
             
             // >> PART II <<
             can.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            */
+        },
+        
+        /*
+         * PART III
+         * funcion para conectar a un canal especifico
+         */
+        connect: function (idConnect) {
+            if (!(idConnect.toString() === "")) {
+                if (!connected) {
+                    channel = idConnect;
+                    alert("Se conecto al canal" + channel );
+                    var can = document.getElementById("canvas");
+
+                    can.addEventListener("click", canvasClick = function canvasClick(evt) {
+                        var pointX = getMousePosition(evt).x;
+                        var pointY = getMousePosition(evt).y;
+
+                        stompClient.send("/topic/newpoint." + channel, {}, JSON.stringify({x: pointX, y: pointY}));
+                    });
+
+                    connectAndSubscribe();
+
+                    connected = true;
+
+                    can.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+                    document.getElementById("id").disabled = true;
+                } else {
+                    alert("Actualmente esta en en canal " + channel);
+                }
+            } else {
+                alert("Debe digitar un canal para conectarse");
+            }
+
         },
 
         publishPoint: function(px,py){
@@ -87,11 +134,27 @@ var app = (function () {
         },
 
         disconnect: function () {
-            if (stompClient !== null) {
+            // >> PART III <<<
+            /*if (stompClient !== null) {
                 stompClient.disconnect();
             }
             setConnected(false);
             console.log("Disconnected");
+            */
+            if (connected) {
+                stompClient.disconnect();
+                stompClient.unsubscribe(channel);
+
+                stompClient = null;
+                alert("Desconexion Exitosa");
+                connected = false;
+                console.log("Disconnected");
+
+                document.getElementById("id").disabled = false;
+                document.getElementById("canvas").removeEventListener("click", canvasClick);
+            } else {
+                alert("No esta conectado a ningun canal");
+            }
         }
     };
 
