@@ -24,15 +24,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <script src="/webjars/sockjs-client/sockjs.min.js"></script>
         <script src="/webjars/stomp-websocket/stomp.min.js"></script>
         <script src="/app.js"></script>
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
     </head>
 
 
-    
+
     <body onload="app.init()">
-        X:<input id="x" type="number"/>
-        Y:<input id="y" type="number"/>        
-        <button onclick="">Send point</button>
-        <canvas id="canvas" width="800" height="600"></canvas>
+        <div class="panel panel-default">
+            <div class="panel-heading">PARTE I - II</div>
+            <div class="panel-body">
+                X:<input disabled id="x" type="number"/>
+                Y:<input disabled id="y" type="number"/>        
+                <button onclick="">Send point</button>
+            </div>
+        </div>
+        <center>
+            <div class="panel panel-info" style="width: 815px; height: 670px">
+                <div class="panel-heading" >
+                    Digite Identificador <input id="id" type="number"/>
+                    <button onclick="app.connect($('#id').val())">Connect</button>
+                    <button onclick="app.disconnect()">Disconnect</button>
+                </div>
+                <div class="panel-body"><canvas id="canvas" width="800" height="600"></canvas></div>
+            </div>
+        </center>
     </body>
 </html>
