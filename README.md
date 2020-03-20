@@ -2,8 +2,8 @@
 
 ## Participantes
 
-  -Armando Nivia
-  -Juan Villate
+  * Armando Chirivi
+  * Juan Villate
 
 ### EVIDENCIAS:
 
