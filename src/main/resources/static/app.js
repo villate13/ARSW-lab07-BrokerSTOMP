@@ -35,13 +35,19 @@ var app = (function () {
         
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
+            // >> PART II << console.log('Connected: ' + frame);
             // >> PART I <<
-            //removemos este pedazo de codigo para publicar en el topico
-            //stompClient.subscribe('/topic/TOPICXX', function (eventbody) {
+            // >> PART I << removemos este pedazo de codigo para publicar en el topico
+            // >> PART I << stompClient.subscribe('/topic/TOPICXX', function (eventbody) {
             stompClient.subscribe('/topic/newpoint', function (eventbody) {
-                alert("Punto x: " + JSON.parse(eventbody.body).x + " Punto y: " + JSON.parse(eventbody.body).y);
-                
+                // >> PART II << alert("Punto x: " + JSON.parse(eventbody.body).x + " Punto y: " + JSON.parse(eventbody.body).y);
+                // >> PART II <<
+                var pointX = JSON.parse(eventbody.body).x;
+                var pointY = JSON.parse(eventbody.body).y;
+
+                var pointToCanvas = new Point(pointX, pointY);
+
+                addPointToCanvas(pointToCanvas);
             });
         });
 
@@ -55,7 +61,19 @@ var app = (function () {
             var can = document.getElementById("canvas");
             
             //websocket connection
+            
+            // >> PART II <<
+            can.addEventListener("click", canvasClick = function canvasClick(evt) {
+                var pointX = getMousePosition(evt).x;
+                var pointY = getMousePosition(evt).y;
+                //alert("Punto x: " + pointX + " Punto y: " + pointY);
+                stompClient.send("/topic/newpoint.", {}, JSON.stringify({x: pointX, y: pointY}));
+            });
+            
             connectAndSubscribe();
+            
+            // >> PART II <<
+            can.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         },
 
         publishPoint: function(px,py){
