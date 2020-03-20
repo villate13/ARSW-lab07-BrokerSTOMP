@@ -21,6 +21,26 @@ var app = (function () {
         ctx.stroke();
     };
     
+    /*
+     * >> PART IV <<
+     * Funcion para crear y dibujar el poligono
+     * @type type
+     */
+    var addPolygonToCanvas = function polygon(polyPoints) {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.moveTo(polyPoints[0].x, polyPoints[0].y);
+        for (var i = 1; i < polyPoints.length; i++) {
+            ctx.lineTo(polyPoints[i].x, polyPoints[i].y);
+        }
+        var colors = ["Black", "Orange", "Red", "Blue", "Yellow", "Green", "Gray"]
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fillStyle = colors[ Math.floor((Math.random() * 6) + 1)];
+        ctx.fill();
+    }
+    
     
     var getMousePosition = function (evt) {
         canvas = document.getElementById("canvas");
@@ -58,6 +78,14 @@ var app = (function () {
 
                 addPointToCanvas(pointToCanvas);
             });
+            
+            // >> PART IV <<
+            stompClient.subscribe('/topic/newpolygon.' + channel, function (eventbody) {
+                console.log("Draw polygon");
+
+                addPolygonToCanvas(JSON.parse(eventbody.body));
+            });
+            
         });
 
     };
@@ -103,8 +131,9 @@ var app = (function () {
                     can.addEventListener("click", canvasClick = function canvasClick(evt) {
                         var pointX = getMousePosition(evt).x;
                         var pointY = getMousePosition(evt).y;
-
-                        stompClient.send("/topic/newpoint." + channel, {}, JSON.stringify({x: pointX, y: pointY}));
+                        
+                        //>> PART IV << cambiar el recurso de /topic/ a /app/
+                        stompClient.send("/app/newpoint." + channel, {}, JSON.stringify({x: pointX, y: pointY}));
                     });
 
                     connectAndSubscribe();
